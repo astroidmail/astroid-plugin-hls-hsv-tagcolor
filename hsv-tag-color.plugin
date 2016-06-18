@@ -1,0 +1,11 @@
+[Plugin]
+Module=hsv-tag-color
+Depends=
+Loader=python3
+Name=HSV tag color
+Description=Chooses a tag color based on HSV
+Authors=Gaute Hope
+Copyright=GPLv3
+Website=
+Help=
+Hidden=false
