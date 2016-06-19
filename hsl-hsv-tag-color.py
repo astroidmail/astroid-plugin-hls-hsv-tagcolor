@@ -9,17 +9,17 @@ import json
 import colorsys
 from hashlib import md5
 
-print ("hsv-tag-color: plugin loading..")
+print ("hsl-tag-color: plugin loading..")
 
-class HsvTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
+class HslTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
   thread_index  = GObject.property (type = Gtk.Box)
 
   json          = {}
   saturation    = .5
-  value         = .5
+  lightness     = .5
 
   def do_activate (self):
-    print ('hsv-tag-color: activate')
+    print ('hsl-tag-color: activate')
     self.config = os.getenv ('ASTROID_CONFIG')
 
     if self.config is not None and os.path.exists (self.config):
@@ -36,7 +36,7 @@ class HsvTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
 
     if self.plugin_config is not None:
       self.saturation = self.plugin_config.get ('saturation', .5)
-      self.value      = self.plugin_config.get ('value', .5)
+      self.lightness  = self.plugin_config.get ('lightness', .5)
 
   def do_deactivate (self):
     print ('hsv-tag-color: deactivate')
