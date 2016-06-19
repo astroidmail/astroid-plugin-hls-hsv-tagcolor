@@ -1,5 +1,5 @@
 [Plugin]
-Module=hsv-tag-color
+Module=hls-hsv-tag-color
 Depends=
 Loader=python3
 Name=HSV tag color

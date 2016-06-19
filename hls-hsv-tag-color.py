@@ -9,17 +9,18 @@ import json
 import colorsys
 from hashlib import md5
 
-print ("hsl-tag-color: plugin loading..")
+print ("hls-hsv-tag-color: plugin loading..")
 
-class HslTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
+class HlsHsvTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
   thread_index  = GObject.property (type = Gtk.Box)
 
   json          = {}
+  colorspace    = 'hls'
   saturation    = .5
-  lightness     = .5
+  lightness     = .5 # hsl
+  value         = .5 # hsv
 
   def do_activate (self):
-    print ('hsl-tag-color: activate')
     self.config = os.getenv ('ASTROID_CONFIG')
 
     if self.config is not None and os.path.exists (self.config):
@@ -27,19 +28,24 @@ class HslTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
         self.json = json.load(cf)
 
     # add configuration options:
-    # plugins.hsv_tag_color.saturation
-    # plugins.hsv_tag_color.value
+    # plugins.hls_hsv_tag_color.colorspace = { 'hls', 'hsv' }
+    # plugins.hls_hsv_tag_color.saturation
+    # plugins.hls_hsv_tag_color.lightness
+    # plugins.hls_hsv_tag_color.value
 
     self.plugin_config = self.json.get ('plugins', None)
     if self.plugin_config is not None:
-      self.plugin_config = self.plugin_config.get ('hsv_tag_color', None)
+      self.plugin_config = self.plugin_config.get ('hls_hsv_tag_color', None)
 
     if self.plugin_config is not None:
+      self.colorspace = self.plugin_config.get ('colorspace', 'hls')
       self.saturation = self.plugin_config.get ('saturation', .5)
       self.lightness  = self.plugin_config.get ('lightness', .5)
 
+    print ('hls-tag-color: activate, colorspace:', self.colorspace)
+
   def do_deactivate (self):
-    print ('hsv-tag-color: deactivate')
+    print ('hls-hsv-tag-color: deactivate')
 
   def do_format_tags (self, tags):
     newtags = []
@@ -51,7 +57,10 @@ class HslTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
 
       hue = m / 0xffffff * 1.0
 
-      (r, g, b) = colorsys.hsv_to_rgb (hue, self.saturation, self.value)
+      if self.colorspace == 'hls':
+        (r, g, b) = colorsys.hls_to_rgb (hue, self.saturation, self.lightness)
+      else:
+        (r, g, b) = colorsys.hsv_to_rgb (hue, self.saturation, self.value)
 
       r = int(r * 255)
       g = int(g * 255)
