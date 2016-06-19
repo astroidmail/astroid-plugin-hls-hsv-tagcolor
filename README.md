@@ -6,8 +6,8 @@ Intro
 
 This plugins generates tag colors based on either the [HLS (_default_) or the
 HSV](https://en.wikipedia.org/wiki/HSL_and_HSV) colorspace. The parameters
-`saturation` and `value` are configurable, while `hue` is generated from the
-MD5 sum of the tag.
+`alpha`, `saturation` and `value` or `lightness` are configurable, while `hue`
+is generated from the MD5 sum of the tag.
 
 Installation
 ------------
