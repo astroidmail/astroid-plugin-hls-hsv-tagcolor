@@ -51,7 +51,7 @@ class HlsHsvTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
   def do_deactivate (self):
     print ('hls-hsv-tag-color: deactivate')
 
-  def do_format_tags (self, bg, tags):
+  def do_format_tags (self, bg, tags, selected):
     newtags = []
 
     # vary hue based on tag md5: saturation and value remain constant.
