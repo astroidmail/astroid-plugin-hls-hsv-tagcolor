@@ -1,7 +1,8 @@
 import gi
 gi.require_version ('Astroid', '0.1')
 gi.require_version ('Gtk', '3.0')
-from gi.repository import GObject, Gtk, Astroid
+gi.require_version ('WebKit', '3.0')
+from gi.repository import GObject, Gtk, Astroid, WebKit
 
 import os, os.path
 import sys
@@ -12,9 +13,7 @@ from hashlib import md5
 
 print ("hls-hsv-tag-color: plugin loading..")
 
-class HlsHsvTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
-  thread_index  = GObject.property (type = Gtk.Box)
-
+class HlsHsvTagColorPlugin (GObject.Object):
   json          = {}
   colorspace    = 'hls'
   saturation    = .5
@@ -71,7 +70,7 @@ class HlsHsvTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
       b = int(b * 255)
       a = int(self.alpha * 255)
 
-      tc = "#%02x%02x%02x%02x" % (r, g, b, a)
+      tc = (r, g, b, a)
 
       # parse bg color
       (rb, gb, bb) = struct.unpack ('BBB', bytes.fromhex(bg[1:7]))
@@ -86,9 +85,45 @@ class HlsHsvTagColorPlugin (GObject.Object, Astroid.ThreadIndexActivatable):
       else:
         fc = "#ffffff"
 
-      ts = "<span bgcolor=\"%s\" color=\"%s\"> %s </span>" % (tc, fc, t)
+      newtags.append ((tc, fc, t))
 
-      newtags.append (ts)
+    return newtags
 
-    return "<span size=\"xx-small\"> </span>".join (newtags)
+class HlsHsvTagColorIndexPlugin (HlsHsvTagColorPlugin, Astroid.ThreadIndexActivatable):
+  thread_index  = GObject.property (type = Gtk.Box)
+
+  def do_activate (self):
+    HlsHsvTagColorPlugin.do_activate (self)
+
+  def do_deactivate (self):
+    HlsHsvTagColorPlugin.do_deactivate (self)
+
+  def do_format_tags (self, bg, tags, selected):
+    tags = HlsHsvTagColorPlugin.do_format_tags (self, bg, tags, selected)
+
+    return "<span size=\"xx-small\"> </span>".join(["<span bgcolor=\"%s\" color=\"%s\"> %s </span>" % (("#%02x%02x%02x%02x" % tc), fc, t) for tc, fc, t in tags])
+
+
+class HlsHsvTagColorViewPlugin (HlsHsvTagColorPlugin, Astroid.ThreadViewActivatable):
+  object = GObject.property (type = GObject.Object)
+  thread_view = GObject.property (type = Gtk.Box)
+  web_view = GObject.property (type = WebKit.WebView)
+
+  def do_activate (self):
+    HlsHsvTagColorPlugin.do_activate (self)
+
+  def do_deactivate (self):
+    HlsHsvTagColorPlugin.do_deactivate (self)
+
+  def do_format_tags (self, bg, tags, selected):
+    tags = HlsHsvTagColorPlugin.do_format_tags (self, bg, tags, selected)
+
+    def f(tags):
+      for t in tags:
+        tc, fc, ts = t
+        r, g, b, a = tc
+        a = a / 255
+        yield "<span style=\"background-color: rgba(%d, %d, %d, %.2f); color: %s !important; white-space: pre;\" > %s </span>" % (r, g, b, a, fc, ts)
+
+    return " ".join(f(tags))
 
