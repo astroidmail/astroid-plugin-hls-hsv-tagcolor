@@ -77,7 +77,7 @@ class HlsHsvTagColorPlugin (GObject.Object):
            (self.alpha * b + (1-self.alpha) * bb)  * .0722) / 255.0;
 
     if lum > 0.5:
-      fc = (0, 0, 0, 0)
+      fc = (0, 0, 0, 255)
     else:
       fc = (255, 255, 255, 255)
 
