@@ -1,8 +1,7 @@
 import gi
 gi.require_version ('Astroid', '0.1')
 gi.require_version ('Gtk', '3.0')
-gi.require_version ('WebKit', '3.0')
-from gi.repository import GObject, Gtk, Astroid, WebKit
+from gi.repository import GObject, Gtk, Astroid
 
 import os, os.path
 import sys
@@ -112,7 +111,6 @@ class HlsHsvTagColorIndexPlugin (HlsHsvTagColorPlugin, Astroid.ThreadIndexActiva
 class HlsHsvTagColorViewPlugin (HlsHsvTagColorPlugin, Astroid.ThreadViewActivatable):
   object = GObject.property (type = GObject.Object)
   thread_view = GObject.property (type = Gtk.Box)
-  web_view = GObject.property (type = WebKit.WebView)
 
   def do_activate (self):
     HlsHsvTagColorPlugin.do_activate (self)
